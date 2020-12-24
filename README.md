@@ -1,7 +1,5 @@
 # Carrefour-Outsource
 Outsourcing project for Carrefour
-# GCP-Carrefour
-GCP automation system with Carrefour
 
 
 
