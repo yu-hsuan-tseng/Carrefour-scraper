@@ -28,6 +28,9 @@ def get_page(url):
     solution-2
 '''
 def get_category2(soup):
+
+    dt = date.today() 
+    dt = dt.strftime('%Y%m%d')  
     #headers =  {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36'}
     tag = soup.find("div",class_="menu")
     l1 = ["menu1","menu1 no-br","menu2","menu3","menu2 no-br","menu3 no-br","menu4 no-br","menu4"]
@@ -44,14 +47,15 @@ def get_category2(soup):
     links = set(links)
 
     for link in tqdm(links):
-      
+        '''
         opener = req.build_opener()
         opener.addheaders = [{'User-Agent','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHaTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36'}]
         req.install_opener(opener)
         response =  req.urlopen(link)
         r = response.read().decode('utf-8')
-        
-        soup = BeautifulSoup(r,'html.parser')
+        '''
+        browser.get(link)
+        soup = BeautifulSoup(browser.page_source,'html.parser')
         c1 = soup.find("div",class_="head").find('a',href=True).text
         c2 = soup.find("div",class_="second").find('a',href=True).text
         all_c3 = soup.find("ul",class_="next_nave_box amart_nav").find_all("div",class_="third")
@@ -97,6 +101,7 @@ def get_category2(soup):
             
     df = pd.DataFrame(df)
     df.index = np.arange(1,len(df)+1) 
+    df.to_csv(dt+"_A_Mart_Category.csv",index=False)
     browser.quit()
     return df,product_links
 
@@ -144,14 +149,14 @@ def page_info(urls):
             pass
     browser.quit()
     df = pd.DataFrame(df)
+    df = df.drop_duplicates()
     df.index = np.arange(1,len(df)+1)
+    df.to_csv(dt+"_A_Mart_info.csv",index=False)
     return df
 
 
+def main():
 
-
-if __name__=="__main__":
-    
     dt = date.today() 
     dt = dt.strftime('%Y%m%d')    
   
@@ -159,6 +164,9 @@ if __name__=="__main__":
     soup = get_page(url)
     df,links = get_category2(soup)
     df = page_info(links)
-   
-    df.to_csv(dt+"_A_Mart_info.csv",index=False)
     print(df.shape)
+
+
+if __name__=="__main__":
+    
+    main()

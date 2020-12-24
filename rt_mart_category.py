@@ -91,12 +91,11 @@ def crawler(url):
                         inner_link.append("https://www.rt-mart.com.tw/direct/"+i.find("a",href=True)['href'])
         except:
             pass
+    '''
     all_url['url'] = inner_link
     all_url = pd.DataFrame(all_url)
     all_url.to_csv("url.csv",index=False)
-
-    u = pd.read_csv("url.csv")
-    inner_link = u.url
+    '''
     # getting all products links for further information extraction 
     df = {"product":[],"product link":[],"image url":[]}
     for link in tqdm(inner_link):
@@ -127,82 +126,119 @@ def page_info(df):
     urls = df['product link']
     info = {"product number":[],"price":[],"suggested price":[],"sales":[],'description':[],"specification":[],"detailed specification":[],"category 1":[],"category 2":[],"category 3":[],"category 4":[],"category 5":[]}
     for url in tqdm(urls):
-        time.sleep(0.5)
-        r = requests.get(url,headers=headers)
-        soup = BeautifulSoup(r.content,'html.parser')
         try:
-            info['product number'].append(soup.find("div",class_="productstar_Box").find("span").text)
-        except:
-            info['product number'].append("None")
-
-        try:
-            s_price = soup.find("div",class_="product_PRICEBOX").find("span",class_="price_snum").text.replace("$","").replace("\r","").replace("\n","")
-            
-            if s_price == '' or s_price==None or s_price == " ":
-                info['price'].append(soup.find("div",class_="product_PRICEBOX").find("span",class_="price_num").text.replace("$","").replace("\r","").replace("\n",""))
-                info['suggested price'].append(soup.find("div",class_="product_PRICEBOX").find("span",class_="price_num").text.replace("$","").replace("\r","").replace("\n",""))
-                
-            else:
-                info['price'].append(soup.find("div",class_="product_PRICEBOX").find("span",class_="price_num").text.replace("$","").replace("\r","").replace("\n",""))
-                info['suggested price'].append(soup.find("div",class_="product_PRICEBOX").find("span",class_="price_snum").text.replace("$","").replace("\r","").replace("\n",""))
-                
-        except:
-            info['price'].append("None")
-            info['suggested price'].append("None")
-        try:
-            info['sales'].append(soup.find("div",class_="bonus_mbox").find('a').text)
-        except:
-            info['sales'].append("None")
-
-
-
-
-        try:
-            category = soup.find("div",class_="navigation").find_all("li")
-            cg = ""
-            for cate in category:
-                cg+=cate.text
-            cate = cg.split(">")
+            r = requests.get(url,headers=headers)
+            soup = BeautifulSoup(r.content,'html.parser')
             try:
-                info['category 1'].append(cate[0])
+                info['product number'].append(soup.find("div",class_="productstar_Box").find("span").text)
+            except:
+                info['product number'].append("None")
+
+            try:
+                s_price = soup.find("div",class_="product_PRICEBOX").find("span",class_="price_snum").text.replace("$","").replace("\r","").replace("\n","")
+            
+                if s_price == '' or s_price==None or s_price == " ":
+                    info['price'].append(soup.find("div",class_="product_PRICEBOX").find("span",class_="price_num").text.replace("$","").replace("\r","").replace("\n",""))
+                    info['suggested price'].append(soup.find("div",class_="product_PRICEBOX").find("span",class_="price_num").text.replace("$","").replace("\r","").replace("\n",""))
+                
+                else:
+                    info['price'].append(soup.find("div",class_="product_PRICEBOX").find("span",class_="price_num").text.replace("$","").replace("\r","").replace("\n",""))
+                    info['suggested price'].append(soup.find("div",class_="product_PRICEBOX").find("span",class_="price_snum").text.replace("$","").replace("\r","").replace("\n",""))
+                
+            except:
+                info['price'].append("None")
+                info['suggested price'].append("None")
+            try:
+                info['sales'].append(soup.find("div",class_="bonus_mbox").find('a').text)
+            except:
+                info['sales'].append("None")
+
+
+
+
+            try:
+                category = soup.find("div",class_="navigation").find_all("li")
+                cg = ""
+                for cate in category:
+                    cg+=cate.text
+                cate = cg.split(">")
+                try:
+                    info['category 1'].append(cate[0])
+                except:
+                    info['category 1'].append("None")
+                try:
+                    info['category 2'].append(cate[1])
+                except:
+                    info['category 2'].append("None")
+                try:
+                    info['category 3'].append(cate[2])
+                except:
+                    info['category 3'].append("None")
+                try:
+                    info['category 4'].append(cate[3])
+                except:
+                    info['category 4'].append("None")
+                try:
+                    info['category 5'].append(cate[4])
+                except:
+                    info['category 5'].append("None")
             except:
                 info['category 1'].append("None")
-            try:
-                info['category 2'].append(cate[1])
-            except:
                 info['category 2'].append("None")
-            try:
-                info['category 3'].append(cate[2])
-            except:
                 info['category 3'].append("None")
-            try:
-                info['category 4'].append(cate[3])
-            except:
                 info['category 4'].append("None")
-            try:
-                info['category 5'].append(cate[4])
-            except:
                 info['category 5'].append("None")
-        except:
-            info['category 1'].append("None")
-            info['category 2'].append("None")
-            info['category 3'].append("None")
-            info['category 4'].append("None")
-            info['category 5'].append("None")
 
         
-        
-        try:
-            
-            if "商品規格" in soup.find("table",class_="title_word").find_all("td")[0].text:
-                spec = soup.find("table",class_="title_word").find_all("td")[1].text
-               
+            try:
+
+                spec = soup.find("table",class_="title_word").text
                 spec = spec.replace("\r","")
                 spec = spec.replace("\n","")
                 spec = spec.replace("\xa0","")
                 spec = spec.replace("\t","")
                 spec = spec.split(" ")
                 k=0
+                for i in spec:
+                    if "商品規格" in i:
+                        pass
+                    elif "規格" in i:
+                        k+=1
+                        i = i.replace("規格","").replace(":","")
+                        info['specification'].append(i)
+                    else:
+                        pass
+                if k ==0:
+                    info['specification'].append("None")
+                '''
+            if soup.find("table",class_="title_word").find("select",class_="for_input"):
+                spec = soup.find("table",class_="title_word").find_all("td")[2].text
+                spec = spec.replace("\r","")
+                spec = spec.replace("\n","")
+                spec = spec.replace("\xa0","")
+                spec = spec.replace("\t","")
+                spec = spec.split(" ")
+                k=0
+                
+                for i in spec:
+                    if "規格" in i:
+                        k+=1
+                        i = i.replace("規格","").replace(":","")
+                        info['specification'].append(i)
+                    else:
+                        pass
+                if k ==0:
+                    info['specification'].append("None")
+            elif "商品規格" in soup.find("table",class_="title_word").find_all("td")[0].text:
+                spec = soup.find("table",class_="title_word").find_all("td")[1].text
+                
+                spec = spec.replace("\r","")
+                spec = spec.replace("\n","")
+                spec = spec.replace("\xa0","")
+                spec = spec.replace("\t","")
+                spec = spec.split(" ")
+                k=0
+                
                 for i in spec:
                     if "規格" in i:
                         k+=1
@@ -220,6 +256,8 @@ def page_info(df):
                 spec = spec.replace("\t","")
                 spec = spec.split(" ")
                 k=0
+                # debudding
+                
                 for i in spec:
                     if "規格" in i:
                         k+=1
@@ -229,32 +267,34 @@ def page_info(df):
                         pass
                 if k ==0:
                     info['specification'].append("None")
-        except:
-            info['specification'].append("None")
+                '''
+            except:
+                info['specification'].append("None")
         
-        try:
-            dspec = soup.find("div",class_="main_indexProbox01").find("div",id="product_content02").text
-            dspec = dspec.replace("\r","")
-            dspec = dspec.replace("\xa0","")
-            dspec = dspec.replace("\t","")
-            #ddes = ddes.replace("\n","")
-            info['detailed specification'].append(dspec)
-        except:
-            info['detailed specification'].append("None")
+            try:
+                dspec = soup.find("div",class_="main_indexProbox01").find("div",id="product_content02").text
+                dspec = dspec.replace("\r","")
+                dspec = dspec.replace("\xa0","")
+                dspec = dspec.replace("\t","")
+                #ddes = ddes.replace("\n","")
+                info['detailed specification'].append(dspec)
+            except:
+                info['detailed specification'].append("None")
 
 
 
-        try:
-            des = soup.find("div",class_="main_indexProbox01").find("div",id="product_content01").text
-            des = des.replace("\r","")
-            des = des.replace("\xa0","")
-            des = des.replace("\t","")
+            try:
+                des = soup.find("div",class_="main_indexProbox01").find("div",id="product_content01").text
+                des = des.replace("\r","")
+                des = des.replace("\xa0","")
+                des = des.replace("\t","")
             #des = des.replace("\n","")
-            info['description'].append(des)
+                info['description'].append(des)
+            except:
+                info['description'].append("None")
         except:
-            info['description'].append("None")
-        
-   
+            time.sleep(1)
+            print("connection error exception")
     return info 
         
 
@@ -272,7 +312,7 @@ def main():
     
     page_url = df['L3 link']
     df = crawler(page_url)
-    df.to_csv("stage01.csv",index=False)
+    #df.to_csv("stage01.csv",index=False)
     
     
     info = page_info(df)
@@ -291,7 +331,7 @@ def main():
     df['price'] = info['price']
     df['suggested price'] = info['suggested price']
     df['sales'] = info['sales']
-
+    df = df.drop_duplicates()
     df.index = np.arange(1,len(df)+1)
     df.to_csv(dt+"_RT_Mart_info.csv",index=False)
     df.to_excel(dt+"_RT_Mart_info.xlsx",index=False,engine='xlsxwriter')
