@@ -132,7 +132,7 @@ def page_info(df):
             try:
                 info['product number'].append(soup.find("div",class_="productstar_Box").find("span").text)
             except:
-                info['product number'].append("None")
+                info['product number'].append("")
 
             try:
                 s_price = soup.find("div",class_="product_PRICEBOX").find("span",class_="price_snum").text.replace("$","").replace("\r","").replace("\n","")
@@ -146,12 +146,12 @@ def page_info(df):
                     info['suggested price'].append(soup.find("div",class_="product_PRICEBOX").find("span",class_="price_snum").text.replace("$","").replace("\r","").replace("\n",""))
                 
             except:
-                info['price'].append("None")
-                info['suggested price'].append("None")
+                info['price'].append("")
+                info['suggested price'].append("")
             try:
                 info['sales'].append(soup.find("div",class_="bonus_mbox").find('a').text)
             except:
-                info['sales'].append("None")
+                info['sales'].append("")
 
 
 
@@ -165,29 +165,29 @@ def page_info(df):
                 try:
                     info['category 1'].append(cate[0])
                 except:
-                    info['category 1'].append("None")
+                    info['category 1'].append("")
                 try:
                     info['category 2'].append(cate[1])
                 except:
-                    info['category 2'].append("None")
+                    info['category 2'].append("")
                 try:
                     info['category 3'].append(cate[2])
                 except:
-                    info['category 3'].append("None")
+                    info['category 3'].append("")
                 try:
                     info['category 4'].append(cate[3])
                 except:
-                    info['category 4'].append("None")
+                    info['category 4'].append("")
                 try:
                     info['category 5'].append(cate[4])
                 except:
-                    info['category 5'].append("None")
+                    info['category 5'].append("")
             except:
-                info['category 1'].append("None")
-                info['category 2'].append("None")
-                info['category 3'].append("None")
-                info['category 4'].append("None")
-                info['category 5'].append("None")
+                info['category 1'].append("")
+                info['category 2'].append("")
+                info['category 3'].append("")
+                info['category 4'].append("")
+                info['category 5'].append("")
 
         
             try:
@@ -209,7 +209,7 @@ def page_info(df):
                     else:
                         pass
                 if k ==0:
-                    info['specification'].append("None")
+                    info['specification'].append("")
                 '''
             if soup.find("table",class_="title_word").find("select",class_="for_input"):
                 spec = soup.find("table",class_="title_word").find_all("td")[2].text
@@ -269,7 +269,7 @@ def page_info(df):
                     info['specification'].append("None")
                 '''
             except:
-                info['specification'].append("None")
+                info['specification'].append("")
         
             try:
                 dspec = soup.find("div",class_="main_indexProbox01").find("div",id="product_content02").text
@@ -279,7 +279,7 @@ def page_info(df):
                 #ddes = ddes.replace("\n","")
                 info['detailed specification'].append(dspec)
             except:
-                info['detailed specification'].append("None")
+                info['detailed specification'].append("")
 
 
 
@@ -291,7 +291,7 @@ def page_info(df):
             #des = des.replace("\n","")
                 info['description'].append(des)
             except:
-                info['description'].append("None")
+                info['description'].append("")
         except:
             time.sleep(1)
             print("connection error exception")

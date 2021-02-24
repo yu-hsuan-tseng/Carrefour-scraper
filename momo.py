@@ -73,112 +73,161 @@ def get_product_links(urls):
             soup = BeautifulSoup(r,'html.parser')
             tag = soup.find("div",class_='contentArea BTDME CLCODE').find_all('a',href=True)
             for t in tag:
-                links.append("https://www.momoshop.com.tw"+t['href'])
+                if "https" in t['href']:
+                    links.append(t['href'])
+                else:
+                    links.append("https://www.momoshop.com.tw"+t['href'])
         except:
             time.sleep(1)
             pass
     return links
 
 def get_info(urls):
-    df = {"product":[],"product url":[],"image url":[],"product number":[],"suggested price":[],"price":[],"sales":[],"specification":[],"category 1":[],"category 2":[],"category 3":[],"category 4":[],"category 5":[]}
+    df = {"product":[],"product url":[],"image url":[],"product number":[],"suggested price":[],"price":[],"sales":[],"description":[],"detailed specification":[],"specification":[],"category 1":[],"category 2":[],"category 3":[],"category 4":[],"category 5":[]}
     #headers =  {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36'}
     p_urls = []
-    for url in tqdm(urls):
+    browser = webdriver.Chrome(executable_path="./chromedriver")
+    for url in tqdm(urls[:5000]):
         try:
+            '''
             opener = req.build_opener()
             opener.addheaders = [{'User-Agent','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHaTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36'}]
             req.install_opener(opener)
             response =  req.urlopen(url)
             r = response.read().decode('utf-8')
-            soup = BeautifulSoup(r,'html.parser')
-            tag = soup.find("div",class_="contentArea").find_all("li")
+            '''
+            browser.get(url)
+            soup = BeautifulSoup(browser.page_source,'html.parser')
+            tag = soup.find("div",class_="prdListArea bt770class").find_all("li",class_="eachGood")
             for t in tag:
-                try:
-                    p_urls.append("https://www.momoshop.com.tw"+t.find_all("a",href=True)[0]['href'])
+                try:    
+                    if "https" in t.find_all("a",class_="prdUrl")[0]['href']:
+                        p_urls.append(t.find_all("a",class_="prdUrl")[0]['href'])
+                    else:
+                        p_urls.append("https://www.momoshop.com.tw"+t.find_all("a",class_="prdUrl")[0]['href'])
                 except:
                     pass
         except:
             time.sleep(1)
             pass
-    for url in tqdm(p_urls[:10]):
-        
-        opener = req.build_opener()
-        opener.addheaders = [{'User-Agent','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHaTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36'}]
-        req.install_opener(opener)
-        response =  req.urlopen(url)
-        r = response.read().decode('utf-8')
-        soup = BeautifulSoup(r,'html.parser')
-        df['product url'].append(url)
+    #browser.quit()
+    print("product links :"+str(len(p_urls)))
+    for url in tqdm(p_urls[:5870]):
         try:
-            df['product'].append(soup.find("div",class_="prdwarp").find_all("h3")[0].text)
-        except:
-            df['product'].append("None")
-        
-        try:
-            df['image url'].append(soup.find("div",class_="prdimgArea").find_all('img')[0]['src'])
-        except:
-            df['image url'].append("None")
+            '''
+            opener = req.build_opener()
+            opener.addheaders = [{'User-Agent','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHaTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36'}]
+            req.install_opener(opener)
+            response =  req.urlopen(url)
+            r = response.read().decode('utf-8')
+            '''
+            browser.get(url)
+            soup = BeautifulSoup(browser.page_source,'html.parser')
+            p_n = soup.find("div",class_="prdwarp").find_all("h3")[0].text
+            
+            try:
+                df['product'].append(soup.find("div",class_="prdwarp").find_all("h3")[0].text)
+            except:
+                df['product'].append("")
+            
+            try:
+                if "https" in soup.find("div",class_="prdimgArea").find_all('img')[0]['src']:
+                    df['image url'].append(soup.find("div",class_="prdimgArea").find_all('img')[0]['src'])
+                elif "//" in soup.find("div",class_="prdimgArea").find_all('img')[0]['src']:
+                    df['image url'].append("https:"+soup.find("div",class_="prdimgArea").find_all('img')[0]['src'])
+                else:
+                    u = "https://img3.momoshop.com.tw"+soup.find("div",class_="prdimgArea").find_all('img')[0]['src']
+                    df['image url'].append(u.replace("..",""))
+            except:
+                df['image url'].append("")
 
-        try:
-            df['product number'].append(soup.find("li",class_="fast").find_all('br')[0].text.replace("品號：",""))
-        except:
-            df['product number'].append("None")
+            try:
+                df['product number'].append(soup.find("li",class_="fast").find_('a').text.replace("品號：",""))
+            except:
+                
+                df['product number'].append("")
 
-        try:
-            df['suggested price'].append(soup.find("ul",class_="prdPrice").find_all("li")[0].text)
-        except:
-            df['suggested price'].append("None")
-        
-        try:
-            df['price'].append(soup.find("ul",class_="prdPrice").find("li",class_="special").text[1])
-        except:
-            df['price'].append("None")
-        
-        try:
-            df['sales'].append(soup.find("ul",class_="ineventArea").find_all('a')[0].text)
-        except:
-            df['sales'].append("None")
+            try:
+                df['suggested price'].append(soup.find("ul",class_="prdPrice").find_all("del").text)
+            except:
+                try:
+                    df['suggested price'].append(soup.find("ul",class_="prdPrice").find("li",class_="special").find("span").text)
+                except:
+                    df['suggested price'].append("")
+            
+            try:
+                df['price'].append(soup.find("ul",class_="prdPrice").find("li",class_="special").find("span").text)
+            except:
+                df['price'].append("")
+            
+            try:
+                df['sales'].append(soup.find("ul",class_="ineventArea").find_all('a')[0].text)
+            except:
+                df['sales'].append("")
 
-        try:
-            df['specification'].append(soup.find("ul",class_="categoryActivityInfo gmclass").find_all("li")[1:].text)
-        except:
-            df['specification'].append("None")
+            try:
+                df['specification'].append(soup.find("ul",class_="categoryActivityInfo gmclass").find_all("li")[1:].text)
+            except:
+                df['specification'].append("")
 
-        # category
-        cate = soup.find("div",class_=" bt770class").find_all("a",href=True)
-        try:
-            df['category 1'].append(cate[0].text)
+            # category
+            
+            try:
+                cate = soup.find("div",class_="bt770class").find_all("li")
+                df['category 1'].append(cate[0].text)
+            except:
+                df['category 1'].append("")
+            try:
+                df['category 2'].append(cate[1].text)
+            except:
+                df['category 2'].append("")
+            try:
+                df['category 3'].append(cate[2].text)
+            except:
+                df['category 3'].append("")
+            try:
+                df['category 4'].append(cate[3].text)
+            except:
+                df['category 4'].append("")
+            try:
+                df['category 5'].append(cate[4].text)
+            except:
+                df['category 5'].append("")
+            try:
+                df['detailed specification'].append(soup.find("div",class_="attributesListArea").text)
+            except:
+                df['detailed specification'].append("")
+            df['product url'].append(url)
+            df['description'].append("")
         except:
-            df['category 1'].append("None")
-        try:
-            df['category 2'].append(cate[1].text)
-        except:
-            df['category 2'].append("None")
-        try:
-            df['category 3'].append(cate[2].text)
-        except:
-            df['category 3'].append("None")
-        try:
-            df['category 4'].append(cate[3].text)
-        except:
-            df['category 4'].append("None")
-        try:
-            df['category 5'].append(cate[4].text)
-        except:
-            df['category 5'].append("None")
-
-    #df = pd.DataFrame(df)
-    #df.index = np.arange(1,len(df)+1)
+            pass
+    try:
+        browser.quit()
+    except:
+        pass
+    df = pd.DataFrame(df)
+    df.index = np.arange(1,len(df)+1)
+    df = df.drop_duplicates()
     return df
 
+def main():
 
-if __name__=="__main__":
 
-
-    url = "https://www.momoshop.com.tw/category/LgrpCategory.jsp?l_code=1912900000&mdiv=1099600000-bt_0_996_10-&ctype=B"
+    url = "https://www.momoshop.com.tw/category/LgrpCategory.jsp?l_code=4199900000&mdiv=1099700000-bt_0_957_01-&ctype=B"
     ssl._create_default_https_context = ssl._create_unverified_context
+    
     df = get_category(url)
+   
+    #df = pd.read_csv("20210118_MOMO_Category.csv")
     links = get_product_links(df['L3 link'])
     print(len(links))
     df = get_info(links)
-    print(df)
+    dt = date.today() 
+    dt = dt.strftime('%Y%m%d')    
+    df.to_csv("momo_test.csv",index=False)
+    df.to_csv(dt+"_MOMO_Info.csv",index=False)
+    df.to_excel(dt+"_MOMO_Info.xlsx",index=False,engine='xlsxwriter')
+    print(df.shape)
+    
+if __name__=="__main__":
+	main()

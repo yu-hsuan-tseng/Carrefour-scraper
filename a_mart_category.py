@@ -1,5 +1,7 @@
+ˇ  
 '''
     Collecting the A-Mart category tree
+    date : 2021/01/24
 '''
 import pandas as pd 
 import numpy as np 
@@ -284,16 +286,17 @@ def page_info(urls):
 
 def main():
 
+    '''
+    url = "https://shopping.friday.tw/1/699.html"
+    soup = get_page(url)
+    df,links = get_category2(soup)
+    '''
+    df = pd.read_csv("20210201_amart_link.csv")
+    df = page_info(df)
+    print(df.shape)
     
-    #url = "https://shopping.friday.tw/1/699.html"
-    #soup = get_page(url)
-    #df,links = get_category2(soup)
-    #link = pd.read_csv("20201228_amart_link.csv")
-    #df = page_info(link)
-    #print(df.shape)
-    df = pd.read_csv("20201228_A_Mart_info.csv")
-    df.to_excel("20201228_A_Mart_info.xlsx",index=False,engine='xlsxwriter')
-
+ 
 if __name__=="__main__":
     
     main()
+
