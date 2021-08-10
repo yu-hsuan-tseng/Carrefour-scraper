@@ -43,6 +43,7 @@ def get_l1(url):
 def get_category(category,link):
     df  = {"L1":[],"L2":[],"L3":[],"L3 link":[]}
     for ct,lk in tqdm(zip(category,link)):
+        print(lk)
         r = requests.get(lk)
         soup = BeautifulSoup(r.content,'html.parser')
         tag = soup.find("div",class_="L_Box").find_all("h3",class_="classify_title")

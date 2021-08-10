@@ -1,4 +1,4 @@
-ˇ  
+
 '''
     Collecting the A-Mart category tree
     date : 2021/01/24
@@ -127,7 +127,8 @@ def page_info(urls):
     dt = dt.strftime('%Y%m%d')  
     browser = webdriver.Chrome(executable_path="./chromedriver")
     df = {"product":[],"product link":[],'image url':[],"product number":[],"price":[],"suggested price":[],"sales":[],'description':[],"specification":[],"detailed specification":[],"category 1":[],"category 2":[],"category 3":[],"category 4":[],"category 5":[]} 
-    for url in tqdm(urls['links']):
+    
+    for url in tqdm(urls):
         try:
             
             browser.get(url)
@@ -257,7 +258,7 @@ def page_info(urls):
             print('exception occurs in :'+ url)
             time.sleep(1.5)
             pass
-    '''
+    
     browser.quit()
     print(len(df['product']))
     print(len(df['product link']))
@@ -275,7 +276,7 @@ def page_info(urls):
     print(len(df['category 5']))
     print(len(df['sales']))
     #print(df)
-    '''
+
     df = pd.DataFrame(df)
     df = df.drop_duplicates()
     df.index = np.arange(1,len(df)+1)
@@ -286,13 +287,12 @@ def page_info(urls):
 
 def main():
 
-    '''
+    
     url = "https://shopping.friday.tw/1/699.html"
     soup = get_page(url)
     df,links = get_category2(soup)
-    '''
-    df = pd.read_csv("20210201_amart_link.csv")
-    df = page_info(df)
+    #df = pd.read_csv("20210302_amart_link.csv")
+    df = page_info(links)
     print(df.shape)
     
  
