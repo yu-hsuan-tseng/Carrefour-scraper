@@ -9,8 +9,10 @@ from tqdm import tqdm
 class Comparing:
 
     def __init__(self):
-        self.data1 = pd.read_csv("comp.csv")
-        self.data2 = pd.read_csv("./20210201/20210201_RT_Mart_info.csv")
+        # self.data1 is the spec from carrefour
+        # self.data2 is the spec extracted by our tool
+        self.data1 = pd.read_csv("xx.csv")
+        self.data2 = pd.read_csv("xx.csv")
         
     def word2vec(self,s1,s2):
 
