@@ -63,8 +63,15 @@ Outsourcing project for Carrefour
     ```sh
     pip3 install datetime
     ```
+ 4. Download chromedriver. It depends on your local machine.(https://chromedriver.chromium.org/downloads)
 
-
+ 5. Run python file
+    ```sh
+    python3 momo.py
+    python3 a_mart_category.py
+    python3 rt_mart_category.py
+    python3 nh_rt_mart_category.py
+    ```
 <!-- USAGE EXAMPLES -->
 ## Usage
 
@@ -85,7 +92,7 @@ See the (https://github.com/steven0323/GCP-Carrefour.git) for a list of proposed
 <!-- CONTACT -->
 ## Contact
 
-Steven Tseng - yuhtseng@ucdavis.edu - email
+Steven Tseng - Steph199603@gmail.com - email
 
 Project Link: [https://github.com/steven0323/GCP-Carrefour]
 
